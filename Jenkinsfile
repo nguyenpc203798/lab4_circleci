@@ -59,12 +59,14 @@ pipeline {
                     🎉 *Build Successful!*
                     *Project*: ${env.JOB_NAME}
                     *Build Number*: #${env.BUILD_NUMBER}
-                    *Status*: SUCCESS
-                    *Duration*: ${currentBuild.durationString}
                 """.stripIndent()
                 
+                echo "Sending to Telegram..."
+                echo "Bot Token: ${TELEGRAM_BOT_TOKEN.take(10)}..."
+                echo "Chat ID: ${TELEGRAM_CHAT_ID}"
+                
                 sh """
-                    curl -s -X POST https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage \
+                    curl -v -X POST https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage \
                     -d chat_id=${TELEGRAM_CHAT_ID} \
                     -d parse_mode=Markdown \
                     -d text="${message}"
