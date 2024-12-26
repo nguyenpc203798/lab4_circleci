@@ -1,0 +1,11 @@
+# Source code
+*.go text eol=lf
+
+# Docker
+Dockerfile text eol=lf
+
+# Jenkins
+Jenkinsfile text eol=lf
+
+# Mặc định cho các file khác
+* text=auto 
