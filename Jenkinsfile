@@ -1,9 +1,17 @@
 pipeline {
-    agent any
+    agent {
+        docker {
+            image 'docker:dind'
+            args '--privileged'
+        }
+    }
 
     environment {
         DOCKER_IMAGE = 'nguyenpc203/devops_final'
         DOCKER_TAG = 'latest'
+        DOCKER_HOST = 'tcp://192.168.99.100:2376'
+        DOCKER_CERT_PATH = '/path/to/certs'
+        DOCKER_TLS_VERIFY = '1'
     }
 
     stages {
