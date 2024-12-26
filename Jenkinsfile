@@ -9,7 +9,7 @@ pipeline {
     stages {
         stage('Clone Repository') {
             steps {
-                git branch: 'main', url: 'https://github.com/nguyenpc203798/devops-final.git'
+                git branch: 'master', url: 'https://github.com/nguyenpc203798/devops-final.git'
             }
         }
 
@@ -40,17 +40,12 @@ pipeline {
         stage('Deploy Golang to DEV') {
             steps {
                 echo 'Deploying to DEV...'
-                sh 'docker image pull nguyenpc203/devops_final:latest'
-                sh 'docker container stop devops_final || echo "this container does not exist"'
+                sh 'docker image pull trongpham99/golang-jenkins:latest'
+                sh 'docker container stop golang-jenkins || echo "this container does not exist"'
                 sh 'docker network create dev || echo "this network exists"'
                 sh 'echo y | docker container prune '
-                sh 'docker container run -d --rm --name devops_final-v1 -p 3000:3000 --network dev nguyenpc203/devops_final:latest'
-            }
-        }
 
-        stage('Deploy Golang to PROD') {
-            steps {
-                echo 'Deploying to PROD...'
+                sh 'docker container run -d --rm --name server-golang -p 4000:3000 --network dev nguyenpc203/devops_final:latest'
             }
         }
     }
