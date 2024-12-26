@@ -6,7 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-const PORT = "3000"
+const PORT = "4000"
 
 func main() {
 	r := gin.Default()

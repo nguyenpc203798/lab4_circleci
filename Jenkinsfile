@@ -1,17 +1,9 @@
 pipeline {
-    agent {
-        docker {
-            image 'docker:dind'
-            args '--privileged'
-        }
-    }
+    agent any
 
     environment {
-        DOCKER_IMAGE = 'nguyenpc203/devops_final'
+        DOCKER_IMAGE = 'nguyenpc203/devops-final'
         DOCKER_TAG = 'latest'
-        DOCKER_HOST = 'tcp://192.168.99.100:2376'
-        DOCKER_CERT_PATH = '/path/to/certs'
-        DOCKER_TLS_VERIFY = '1'
     }
 
     stages {
@@ -48,12 +40,12 @@ pipeline {
         stage('Deploy Golang to DEV') {
             steps {
                 echo 'Deploying to DEV...'
-                sh 'docker image pull trongpham99/golang-jenkins:latest'
-                sh 'docker container stop golang-jenkins || echo "this container does not exist"'
+                sh 'docker image pull nguyenpc203/devops-final:latest'
+                sh 'docker container stop devops-final || echo "this container does not exist"'
                 sh 'docker network create dev || echo "this network exists"'
                 sh 'echo y | docker container prune '
 
-                sh 'docker container run -d --rm --name server-golang -p 4000:3000 --network dev nguyenpc203/devops_final:latest'
+                sh 'docker container run -d --rm --name devops-final -p 4000:4000 --network dev nguyenpc203/devops-final:latest'
             }
         }
     }

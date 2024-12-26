@@ -10,7 +10,7 @@ COPY . .
 
 RUN go build -o devops_final .
 
-EXPOSE 3000
+EXPOSE 4000
 
 # Command to run the application
 CMD ["./devops_final"]
