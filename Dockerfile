@@ -10,7 +10,7 @@ COPY . .
 
 RUN go build -o circle_ci .
 
-EXPOSE 4000
+EXPOSE 4001
 
 # Command to run the application
 CMD ["./circle_ci"]
