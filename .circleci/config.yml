@@ -23,11 +23,16 @@ jobs:
 
   build-and-push-docker:
     docker:
-      - image: cimg/docker:20.10
+      - image: cimg/base:stable
     steps:
       - checkout
       - setup_remote_docker
       - docker/check
+      - run:
+          name: Install Docker client
+          command: |
+            sudo apt-get update
+            sudo apt-get install -y docker-ce-cli
       - run:
           name: Generate Docker Image Tags
           command: |
