@@ -3,7 +3,6 @@ version: 2.1
 # Định nghĩa các orbs cần thiết cho Go
 orbs:
   go: circleci/go@1.7.3
-  docker: circleci/docker@2.1.1
 
 jobs:
   build-and-test:
@@ -27,7 +26,6 @@ jobs:
     steps:
       - checkout
       - setup_remote_docker
-      - docker/check
       - run:
           name: Install Docker client
           command: |
@@ -37,18 +35,17 @@ jobs:
           name: Docker Login
           command: echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
       - run:
-          name: Generate Docker Image Tags
+          name: Build and Push Docker Image
           command: |
-            echo 'export DOCKER_IMAGE=$DOCKER_USERNAME/lab_4_circleci' >> $BASH_ENV
-            # Sử dụng git tag nếu có, nếu không thì dùng commit hash
-            echo 'export DOCKER_TAG=${CIRCLE_TAG:-$CIRCLE_SHA1}' >> $BASH_ENV
-            source $BASH_ENV
-      - docker/build:
-          image: $DOCKER_USERNAME/lab_4_circleci
-          tag: latest,$DOCKER_TAG
-      - docker/push:
-          image: $DOCKER_USERNAME/lab_4_circleci
-          tag: latest,$DOCKER_TAG
+            # Tạo tag từ git tag hoặc commit hash
+            DOCKER_TAG=${CIRCLE_TAG:-$CIRCLE_SHA1}
+            
+            # Build Docker image
+            docker build -t $DOCKER_USERNAME/lab_4_circleci:latest -t $DOCKER_USERNAME/lab_4_circleci:$DOCKER_TAG .
+            
+            # Push Docker images
+            docker push $DOCKER_USERNAME/lab_4_circleci:latest
+            docker push $DOCKER_USERNAME/lab_4_circleci:$DOCKER_TAG
 
 workflows:
   version: 2
@@ -62,9 +59,7 @@ workflows:
           requires:
             - build-and-test
           filters:
-            # Chạy cho tất cả các tags
             tags:
               only: /.*/
-            # Chỉ chạy trên nhánh main
             branches:
               only: main
