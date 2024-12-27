@@ -8,7 +8,7 @@ orbs:
 jobs:
   build-and-test:
     docker:
-      - image: cimg/go:1.20 # Sử dụng image Go mới nhất
+      - image: cimg/go:1.22 # Sử dụng image Go mới nhất
     steps:
       - checkout
       - go/load-cache # Tải cache dependencies
