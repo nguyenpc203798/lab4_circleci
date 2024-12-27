@@ -1,0 +1,62 @@
+version: 2.1
+
+# Định nghĩa các orbs cần thiết cho Go
+orbs:
+  go: circleci/go@1.7.3
+  docker: circleci/docker@2.1.1
+
+jobs:
+  build-and-test:
+    docker:
+      - image: cimg/go:1.20 # Sử dụng image Go mới nhất
+    steps:
+      - checkout
+      - go/load-cache # Tải cache dependencies
+      - go/mod-download # Tải dependencies
+      - go/save-cache # Lưu cache dependencies
+      - run:
+          name: Run tests
+          command: go test -v ./...
+      - run:
+          name: Build application
+          command: go build -v
+
+  build-and-push-docker:
+    docker:
+      - image: cimg/docker:20.10
+    steps:
+      - checkout
+      - setup_remote_docker
+      - docker/check
+      - run:
+          name: Generate Docker Image Tags
+          command: |
+            echo 'export DOCKER_IMAGE=$DOCKER_USERNAME/lab_4_circleci' >> $BASH_ENV
+            # Sử dụng git tag nếu có, nếu không thì dùng commit hash
+            echo 'export DOCKER_TAG=${CIRCLE_TAG:-$CIRCLE_SHA1}' >> $BASH_ENV
+            source $BASH_ENV
+      - docker/build:
+          image: $DOCKER_USERNAME/lab_4_circleci
+          tag: latest,$DOCKER_TAG
+      - docker/push:
+          image: $DOCKER_USERNAME/lab_4_circleci
+          tag: latest,$DOCKER_TAG
+
+workflows:
+  version: 2
+  build-test-deploy:
+    jobs:
+      - build-and-test:
+          filters:
+            tags:
+              only: /.*/
+      - build-and-push-docker:
+          requires:
+            - build-and-test
+          filters:
+            # Chạy cho tất cả các tags
+            tags:
+              only: /.*/
+            # Chỉ chạy trên nhánh main
+            branches:
+              only: main
